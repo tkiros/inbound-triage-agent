@@ -1,0 +1,23 @@
+# Slack app for the triage approver (app/slack_approver.py).
+# Create it at https://api.slack.com/apps -> Create New App -> From a manifest, and paste this.
+#
+# A manifest can't create the app-level token Socket Mode needs. After creating the app:
+#   Basic Information -> App-Level Tokens -> Generate, scope `connections:write`  -> SLACK_APP_TOKEN
+#   Install App -> Install to Workspace -> Bot User OAuth Token (xoxb-...)          -> SLACK_BOT_TOKEN
+display_information:
+  name: Triage Approver
+  description: Approve or reject held customer-email replies.
+features:
+  bot_user:
+    display_name: triage-approver
+    always_online: false
+oauth_config:
+  scopes:
+    bot:
+      - chat:write  # post held emails, update them after a click, ephemeral "not allowed" notes
+settings:
+  interactivity:
+    is_enabled: true  # the Approve / Reject buttons
+  socket_mode_enabled: true  # clicks arrive over a websocket: no public URL needed
+  org_deploy_enabled: false
+  token_rotation_enabled: false

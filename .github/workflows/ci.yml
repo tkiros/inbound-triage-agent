@@ -1,0 +1,26 @@
+name: ci
+on: [push, pull_request]
+
+# Every step runs without ANTHROPIC_API_KEY or Slack tokens: model calls in tests go to a fake
+# API, and the eval smoke run and the demo use offline mode.
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - name: config files parse
+        run: |
+          uv run python -c "import yaml; [yaml.safe_load(open(f)) for f in ('.github/workflows/ci.yml', 'slack/manifest.yml')]"
+          docker compose config -q
+      - run: cp .env.example .env
+      - name: start Postgres (ParadeDB) with the init SQL
+        run: docker compose up -d --wait db
+      - run: uv run --env-file .env pytest -q
+      - run: uv run --env-file .env python -m data.seed
+      - name: eval smoke run (offline mode, no model)
+        run: uv run --env-file .env python -m evals.run --split dev --limit 20 --systems offline
+      - name: demo (offline mode)
+        run: uv run --env-file .env python -m scripts.demo
