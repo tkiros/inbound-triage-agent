@@ -317,9 +317,8 @@ These are deviations from the build guide's P1 spec, and why.
 - **Connections:** one new database connection per query (the template's choice); use
   `psycopg_pool` when throughput matters.
 - **Offline drafts are English templates,** even for Spanish, French and German emails.
-- **Not run here:**
-  - the GitHub Actions workflow (its YAML parses locally);
-  - the app image build, because this machine's containers have no DNS.
+- **Not run here:** the app image build, because this machine's containers have no DNS. (The
+  GitHub Actions workflow passes on GitHub: ruff, 69 tests, offline eval smoke run and demo.)
 
 ## What I'd do next
 
